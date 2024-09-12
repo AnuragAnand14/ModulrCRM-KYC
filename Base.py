@@ -18,7 +18,7 @@ load_dotenv("myenv/.env")
 st.set_page_config(page_title="CRM", layout="wide")
 # Retrieve environment variables
 DB_HOST = os.getenv('DB_HOST')
-DB_NAME = os.getenv('DB_DATABASE')
+DB_NAME = os.getenv('DB_NAME')
 DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
@@ -248,7 +248,7 @@ def send_whatsapp_message(to_number, message):
 def send_trigger_to_all(df):
     for _, row in df.iterrows():
         ticket = create_ticket(row)
-        unique_link = f"https://mjd3mtr4-8503.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
+        unique_link = f"https://mjd3mtr4-8502.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
         
         # Use 'verification_type' instead of 'product_type'
         verification_type = row.get('verification_type', row.get('product_type', 'Default'))
@@ -325,7 +325,7 @@ def main():
                 st.markdown('<div class="contact-buttons">', unsafe_allow_html=True)
                 if st.button("Contact via Email", key=f"email_{row['id']}"):
                     ticket = create_ticket(row)
-                    unique_link = f"https://mjd3mtr4-8503.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
+                    unique_link = f"https://mjd3mtr4-8502.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
                     
                     verification_type = row.get('verification_type', row.get('product_type', 'Default'))
                     doc_table = get_document_table(verification_type)
@@ -346,7 +346,7 @@ Thank you"""
                 
                 if st.button("Contact via WhatsApp", key=f"whatsapp_{row['id']}"):
                     ticket = create_ticket(row)
-                    unique_link = f"https://mjd3mtr4-8503.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
+                    unique_link = f"https://mjd3mtr4-8502.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
                     
                     whatsapp_message = f"""Hi {row['first_name']} {row['last_name']},
 
