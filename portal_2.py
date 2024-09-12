@@ -186,7 +186,9 @@ def get_ticket_id_from_url():
     return st.query_params.get("ticket_id", None)
 
 def main():
-    st.title("Modulr Document Validator")
+    st.image("/Users/anurag.anand/Desktop/ModulrCRM-KYC/9faa1c9f8df5fcd4_800x800ar-removebg-preview.png", width=200)
+    st.title("Document Validator")
+    
 
     if "last_uploaded_file" not in st.session_state:
         st.session_state.last_uploaded_file = None
