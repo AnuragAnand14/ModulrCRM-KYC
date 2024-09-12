@@ -186,7 +186,7 @@ def get_ticket_id_from_url():
     return st.query_params.get("ticket_id", None)
 
 def main():
-    st.image("/Users/anurag.anand/Desktop/ModulrCRM-KYC/9faa1c9f8df5fcd4_800x800ar-removebg-preview.png", width=200)
+    st.image("/Users/Angad.Kwatra/Desktop/modulr_crm/ModulrCRM-KYC/Modulr_logo.png", width=200)
     st.title("Document Validator")
     
 
@@ -196,7 +196,11 @@ def main():
     # Get ticket_id from URL parameter
     url_ticket_id = get_ticket_id_from_url()
 
-    col1, col2 = st.columns(2)
+    col1, col2,col3,col4 = st.columns([3,1,2,1])
+    with col4:
+        st.title("")
+    with col2:
+        st.title("")
     with col1:
         # Auto-populate ticket ID if available in URL
         ticket_id = st.text_input("Enter your Ticket ID:", value=url_ticket_id, key="ticket_id")
@@ -220,7 +224,7 @@ def main():
         if uploaded_doc is not None:
             file_type = uploaded_doc.type
             # Preview for image files
-            with col2:
+            with col3:
                 if file_type in ["image/jpeg", "image/jpg", "image/png"]:
                     st.text("Image Preview:")
                     image = Image.open(uploaded_doc)
