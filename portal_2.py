@@ -222,6 +222,7 @@ def main():
                 if file_type in ["image/jpeg", "image/jpg", "image/png"]:
                     st.text("Image Preview:")
                     image = Image.open(uploaded_doc)
+
                     st.image(image, caption="Uploaded Image", use_column_width=True)
                 # Preview for PDF files
                 elif file_type == "application/pdf":
