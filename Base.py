@@ -14,11 +14,11 @@ from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 
 # Load environment variables from .env filexx
-load_dotenv()
+load_dotenv("myenv/.env")
 st.set_page_config(page_title="CRM", layout="wide")
 # Retrieve environment variables
 DB_HOST = os.getenv('DB_HOST')
-DB_NAME = os.getenv('DB_NAME')
+DB_NAME = os.getenv('DB_DATABASE')
 DB_USER = os.getenv('DB_USER')
 DB_PASSWORD = os.getenv('DB_PASSWORD')
 TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
@@ -277,8 +277,8 @@ Thank you"""
 def main():
     # Add logo and title in a horizontal layout
     col1, col2 = st.columns([1, 4])
-    with col1:
-        st.image("/Users/anurag.anand/BRAG/download.jpeg", width=200)
+    # with col1:
+    #     st.image("/Users/anurag.anand/BRAG/download.jpeg", width=200)
     with col2:
         st.title("Customer Relationship Management")
 
