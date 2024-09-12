@@ -32,7 +32,7 @@ st.set_page_config(page_title="Document Upload Portal", layout="wide")
 # Database connection
 connection = psycopg2.connect(
     host='bci-rd.postgres.database.azure.com',
-    database='postgres',
+    database='modulr_crm',
     user='pgadmin',
     password='5y62<Rluh'
 )
@@ -55,9 +55,9 @@ def is_valid_uuid(val):
 def get_dropdown_names(TicketType):
     if TicketType == "Income":
         return ["Payslip", "Bank Statement"]
-    elif TicketType == "Fraud":
+    elif TicketType == "KYC":
         return ["Passport", "Driving License"]
-    elif TicketType == "Both":
+    elif TicketType == "KYC and Income":
         return ["Payslip", "Bank Statement", "Passport", "Driving License"]
 
 def get_ticket_type(ticket_id):
@@ -186,7 +186,7 @@ def get_ticket_id_from_url():
     return st.query_params.get("ticket_id", None)
 
 def main():
-    st.title("OBF Document Validator")
+    st.title("Modulr Document Validator")
 
     if "last_uploaded_file" not in st.session_state:
         st.session_state.last_uploaded_file = None
