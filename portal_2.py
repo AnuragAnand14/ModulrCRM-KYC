@@ -186,8 +186,16 @@ def get_ticket_id_from_url():
     return st.query_params.get("ticket_id", None)
 
 def main():
-    st.image("/Users/Angad.Kwatra/Desktop/modulr_crm/ModulrCRM-KYC/Modulr_logo.png", width=200)
+    st.image("https://cdn.asp.events/CLIENT_CL_Conf_BDA05934_5056_B731_4C9EEBBE0C2416C2/sites/PayExpo-2020/media/libraries/sponsor/Modulr-Logo-CMYK-420x155.png/fit-in/700x9999/filters:no_upscale()", width=200)
     st.title("Document Validator")
+    st.markdown(
+        """
+        <div class="footer">
+            Disclaimer: All documents used in this demo are either AI-generated or pseudonymized.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
     
 
     if "last_uploaded_file" not in st.session_state:
@@ -196,11 +204,9 @@ def main():
     # Get ticket_id from URL parameter
     url_ticket_id = get_ticket_id_from_url()
 
-    col1, col2,col3,col4 = st.columns([3,1,2,1])
-    with col4:
-        st.title("")
-    with col2:
-        st.title("")
+    col1, col2 ,col3,col4 = st.columns([3,1,2,1])
+    with col4:st.markdown("")
+    with col3:st.markdown("")
     with col1:
         # Auto-populate ticket ID if available in URL
         ticket_id = st.text_input("Enter your Ticket ID:", value=url_ticket_id, key="ticket_id")
@@ -228,7 +234,6 @@ def main():
                 if file_type in ["image/jpeg", "image/jpg", "image/png"]:
                     st.text("Image Preview:")
                     image = Image.open(uploaded_doc)
-
                     st.image(image, caption="Uploaded Image", use_column_width=True)
                 # Preview for PDF files
                 elif file_type == "application/pdf":
@@ -253,7 +258,7 @@ def main():
                 st.session_state.last_uploaded_file = uploaded_doc
 
                 verification_result = verify_document(
-                    document_type, file_path, "Aanchal", "Batra"
+                    document_type, file_path, "Mona", "Lisa"
                 )
                 create_document(file_path, ticket_id, document_type, verification_result, get_uuid(ticket_id))
 
