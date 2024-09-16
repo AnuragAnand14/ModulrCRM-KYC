@@ -52,7 +52,7 @@ st.markdown("""
         padding: 1rem;
     }
     h1, h2, h3, h4 {
-        color: #1E3A8A;
+        color: #000000;
         margin-bottom: 0.5rem;
     }
     .stButton > button {
@@ -276,9 +276,9 @@ Thank you"""
             st.error(result)
 def main():
     # Add logo and title in a horizontal layout
-    col1, col2 = st.columns([1, 4])
+    col1, col2 = st.columns([1, 6])
     with col1:
-         st.image("/Users/Angad.Kwatra/Desktop/modulr_crm/ModulrCRM-KYC/Modulr_logo.png", width=200)
+         st.image("https://www.blenheimchalcot.com/wp-content/uploads/2018/07/modulr-finance-limited-logo-vector.svg", width=200)
     with col2:
         st.title("Customer Relationship Management Portal")
 
@@ -290,9 +290,9 @@ def main():
     try:
         cur.execute("SELECT * FROM obf_users WHERE deleted_at IS NULL AND is_active = TRUE")
         df = pd.DataFrame(cur.fetchall())
-        st.success("Data loaded successfully")
+        st.success("Customer Details Fetched Succesfully")
     except Exception as e:
-        st.error(f"Error loading data: {e}")
+        st.error(f"Error Loading Customer Data: {e}")
         return
     finally:
         cur.close()
@@ -381,7 +381,7 @@ Thank you"""
             st.markdown('</div>', unsafe_allow_html=True)
 
     # Display the tickets in a collapsible format
-    with st.expander("View Ticket Updates", expanded=False):
+    with st.expander("View ll Ticket Updates", expanded=False):
         st.markdown('<div class="dataframe-container">', unsafe_allow_html=True)
         try:
             df_tickets = pd.DataFrame(tickets)
