@@ -50,21 +50,43 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-def get_gmail_service():
-    creds = None
-    # Load token.json and credentials.json from secrets
-    if 'token' in st.session_state:
-        creds = Credentials.from_authorized_user_info(st.secrets['token'], SCOPES)
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            # Load credentials.json from Streamlit secrets
-            flow = InstalledAppFlow.from_client_config(st.secrets["credentials"], SCOPES)
-            creds = flow.run_local_server(port=0)
-        st.session_state['token'] = json.loads(creds.to_json())  # Store token in session state
 
-    return build('gmail', 'v1', credentials=creds)
+def get_gmail_service():
+    # Load secrets from Streamlit's st.secrets
+    client_secrets = {
+        "installed": {
+            "client_id": st.secrets["client_id"],
+            "project_id": st.secrets["project_id"],
+            "auth_uri": st.secrets["auth_uri"],
+            "token_uri": st.secrets["token_uri"],
+            "auth_provider_x509_cert_url": st.secrets["auth_provider_x509_cert_url"],
+            "client_secret": st.secrets["client_secret"],
+            "redirect_uris": st.secrets["redirect_uris"]
+        }
+    }
+
+    # Save the client_secrets dict to a temporary JSON file
+    with open('client_secret.json', 'w') as secret_file:
+        json.dump(client_secrets, secret_file)
+
+    # OAuth flow
+    flow = InstalledAppFlow.from_client_secrets_file(
+        'client_secret.json', scopes=['https://www.googleapis.com/auth/gmail.send']
+    )
+
+    # Disable browser launch and print the auth URL instead
+    auth_url, _ = flow.authorization_url(prompt='consent')
+    st.write(f"Please go to this URL: {auth_url}")
+
+    # Ask user for the authorization code manually in Streamlit
+    auth_code = st.text_input("Enter the authorization code:", "")
+
+    if auth_code:
+        flow.fetch_token(code=auth_code)
+        credentials = flow.credentials
+        return credentials
+    else:
+        st.warning("Please enter the authorization code.")
 
 def get_document_table(verification_type):
     documents = {
