@@ -21,12 +21,14 @@ import psycopg2
 from psycopg2 import sql
 from urllib.parse import urlparse, parse_qs
 from pdf2image import convert_from_bytes
-import io
+import io 
+
+# Adjust PATH for Homebrew
+os.environ['PATH'] += os.pathsep + '/opt/homebrew/bin'
 
 # Streamlit page configuration
 st.set_page_config(page_title="Document Upload Portal", layout="wide")
 
-# Database connection using secrets
 db_config = st.secrets["database"]
 connection = psycopg2.connect(
     host=db_config["host"],
@@ -37,8 +39,7 @@ connection = psycopg2.connect(
 cursor = connection.cursor()
 
 # OpenAI API key from secrets
-openai.api_key = st.secrets["openai"]["api_key"]
-model = ChatOpenAI(model="gpt-4o")
+
 
 def load_css(file_path):
     with open(file_path) as f:
@@ -295,3 +296,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
