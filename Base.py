@@ -14,7 +14,7 @@ from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 
 # Load environment variables from .env filexx
-load_dotenv()
+load_dotenv("myenv/.env")
 st.set_page_config(page_title="CRM", layout="wide")
 # Retrieve environment variables
 DB_HOST = os.getenv('DB_HOST')
@@ -154,7 +154,7 @@ def get_gmail_service():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials1.json', SCOPES)
+                'credentials.json', SCOPES)
             creds = flow.run_local_server(port=0)
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
@@ -248,7 +248,7 @@ def send_whatsapp_message(to_number, message):
 def send_trigger_to_all(df):
     for _, row in df.iterrows():
         ticket = create_ticket(row)
-        unique_link = f"https://q97wqzd4-8502.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
+        unique_link = f"https://mjd3mtr4-8502.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
         
         # Use 'verification_type' instead of 'product_type'
         verification_type = row.get('verification_type', row.get('product_type', 'Default'))
@@ -278,9 +278,9 @@ def main():
     # Add logo and title in a horizontal layout
     col1, col2 = st.columns([1, 4])
     with col1:
-        st.image("/Users/anurag.anand/BRAG/download.jpeg", width=200)
+         st.image("/Users/Angad.Kwatra/Desktop/modulr_crm/ModulrCRM-KYC/Modulr_logo.png", width=200)
     with col2:
-        st.title("Customer Relationship Management")
+        st.title("Customer Relationship Management Portal")
 
     st.markdown("---")
 
@@ -325,14 +325,14 @@ def main():
                 st.markdown('<div class="contact-buttons">', unsafe_allow_html=True)
                 if st.button("Contact via Email", key=f"email_{row['id']}"):
                     ticket = create_ticket(row)
-                    unique_link = f"https://q97wqzd4-8502.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
+                    unique_link = f"https://mjd3mtr4-8502.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
                     
                     verification_type = row.get('verification_type', row.get('product_type', 'Default'))
                     doc_table = get_document_table(verification_type)
                     
                     email_body = f"""Hi {row['first_name']} {row['last_name']},
 
-We have reviewed your application for {verification_type} verification and request you to upload the following documents to proceed further:
+We have reviewed your application for onboarding at Modulr.Please proceed for {verification_type} verification. Upload the following documents to proceed further:
 
 {doc_table}
 
@@ -346,7 +346,7 @@ Thank you"""
                 
                 if st.button("Contact via WhatsApp", key=f"whatsapp_{row['id']}"):
                     ticket = create_ticket(row)
-                    unique_link = f"https://q97wqzd4-8502.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
+                    unique_link = f"https://mjd3mtr4-8502.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
                     
                     whatsapp_message = f"""Hi {row['first_name']} {row['last_name']},
 
@@ -373,7 +373,6 @@ Thank you"""
                         st.markdown(f"""
                         <div class="ticket-card">
                             <div class="ticket-header">Ticket No: {ticket["id"]}</div>
-                            <div class="ticket-info"><strong>Ticket Type:</strong> {ticket["ticket_type"]}</div>
                             <div class="ticket-info"><strong>Created At:</strong> {ticket["created_at"]}</div>
                             <div class="ticket-info"><strong>Status:</strong> {ticket["status"]}</div>
                         </div>

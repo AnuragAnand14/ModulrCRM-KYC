@@ -13,11 +13,11 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.output_parsers import PydanticOutputParser
 from langchain_community.document_loaders import PyPDFLoader
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+#from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_core.pydantic_v1 import BaseModel, Field
 
 
-load_dotenv('.env')
+load_dotenv('myenv/.env')
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 openai.api_key = OPENAI_API_KEY
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
