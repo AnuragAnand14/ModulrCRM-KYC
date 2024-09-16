@@ -1,35 +1,51 @@
 import streamlit as st
 from PIL import Image
 import PyPDF2
-import io
+import os
 import time
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 import openai
+import fitz
 import base64
+from io import BytesIO
+from langchain_core.messages import HumanMessage
+from langchain_openai import ChatOpenAI
+from langchain_core.pydantic_v1 import BaseModel, Field
+from passport_verify import passport_verify
+from license_verify import license_verify
+from income_verify import checkbankstatement, checkpayslip
 import uuid
 import pandas as pd
 import psycopg2
 from psycopg2 import sql
+from urllib.parse import urlparse, parse_qs
 from pdf2image import convert_from_bytes
+import io
 
 # Streamlit page configuration
 st.set_page_config(page_title="Document Upload Portal", layout="wide")
 
-# Database connection using Streamlit secrets
+# Database connection using secrets
+db_config = st.secrets["database"]
 connection = psycopg2.connect(
-    host=st.secrets["db_host"],
-    database=st.secrets["db_database"],
-    user=st.secrets["db_user"],
-    password=st.secrets["db_password"]
+    host=db_config["host"],
+    database=db_config["database"],
+    user=db_config["user"],
+    password=db_config["password"]
 )
 cursor = connection.cursor()
+
+# OpenAI API key from secrets
+openai.api_key = st.secrets["openai"]["api_key"]
+model = ChatOpenAI(model="gpt-4o")
 
 def load_css(file_path):
     with open(file_path) as f:
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # Load CSS
-load_css('styles2.css')
+load_css(st.secrets["paths"]["css_file"])
 
 def is_valid_uuid(val):
     try:
@@ -83,10 +99,11 @@ def save_uploaded_file(uploaded_file, folder_path, save_name):
         _, file_extension = os.path.splitext(original_filename)
         if not os.path.splitext(save_name)[1]:
             save_name += file_extension
-        # Save to temporary file
-        with open(save_name, "wb") as f:
+        os.makedirs(folder_path, exist_ok=True)
+        file_path = os.path.join(folder_path, save_name)
+        with open(file_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
-        return save_name
+        return file_path
     return None
 
 def verify_document(document_type, file_path, first_name, last_name):
@@ -168,7 +185,7 @@ def update_tickets(ticket_id, document_responses):
     connection.commit()
 
 def get_ticket_id_from_url():
-    return st.experimental_get_query_params().get("ticket_id", [None])[0]
+    return st.query_params.get("ticket_id", None)
 
 def main():
     st.image("https://cdn.asp.events/CLIENT_CL_Conf_BDA05934_5056_B731_4C9EEBBE0C2416C2/sites/PayExpo-2020/media/libraries/sponsor/Modulr-Logo-CMYK-420x155.png/fit-in/700x9999/filters:no_upscale()", width=200)
@@ -182,6 +199,7 @@ def main():
         unsafe_allow_html=True
     )
     
+
     if "last_uploaded_file" not in st.session_state:
         st.session_state.last_uploaded_file = None
 
@@ -237,7 +255,7 @@ def main():
 
             if uploaded_doc != st.session_state.last_uploaded_file:
                 file_path = save_uploaded_file(
-                    uploaded_doc, "tmp", f"{uuid.uuid4()}"
+                    uploaded_doc, document_type, get_uuid(ticket_id)
                 )
                 st.session_state.last_uploaded_file = uploaded_doc
 
