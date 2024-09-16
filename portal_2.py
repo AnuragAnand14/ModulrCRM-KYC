@@ -32,7 +32,7 @@ st.set_page_config(page_title="Document Upload Portal", layout="wide")
 # Database connection
 connection = psycopg2.connect(
     host='bci-rd.postgres.database.azure.com',
-    database='postgres',
+    database='modulr_crm',
     user='pgadmin',
     password='5y62<Rluh'
 )
@@ -55,9 +55,9 @@ def is_valid_uuid(val):
 def get_dropdown_names(TicketType):
     if TicketType == "Income":
         return ["Payslip", "Bank Statement"]
-    elif TicketType == "Fraud":
+    elif TicketType == "KYC":
         return ["Passport", "Driving License"]
-    elif TicketType == "Both":
+    elif TicketType == "KYC and Income":
         return ["Payslip", "Bank Statement", "Passport", "Driving License"]
 
 def get_ticket_type(ticket_id):
@@ -186,7 +186,17 @@ def get_ticket_id_from_url():
     return st.query_params.get("ticket_id", None)
 
 def main():
-    st.title("OBF Document Validator")
+    st.image("https://cdn.asp.events/CLIENT_CL_Conf_BDA05934_5056_B731_4C9EEBBE0C2416C2/sites/PayExpo-2020/media/libraries/sponsor/Modulr-Logo-CMYK-420x155.png/fit-in/700x9999/filters:no_upscale()", width=200)
+    st.title("Document Validator")
+    st.markdown(
+        """
+        <div class="footer">
+            Disclaimer: All documents used in this demo are either AI-generated or pseudonymized.
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
 
     if "last_uploaded_file" not in st.session_state:
         st.session_state.last_uploaded_file = None
@@ -194,7 +204,9 @@ def main():
     # Get ticket_id from URL parameter
     url_ticket_id = get_ticket_id_from_url()
 
-    col1, col2 = st.columns(2)
+    col1, col2 ,col3,col4 = st.columns([3,1,2,1])
+    with col4:st.markdown("")
+    with col3:st.markdown("")
     with col1:
         # Auto-populate ticket ID if available in URL
         ticket_id = st.text_input("Enter your Ticket ID:", value=url_ticket_id, key="ticket_id")
@@ -218,7 +230,7 @@ def main():
         if uploaded_doc is not None:
             file_type = uploaded_doc.type
             # Preview for image files
-            with col2:
+            with col3:
                 if file_type in ["image/jpeg", "image/jpg", "image/png"]:
                     st.text("Image Preview:")
                     image = Image.open(uploaded_doc)
@@ -246,7 +258,7 @@ def main():
                 st.session_state.last_uploaded_file = uploaded_doc
 
                 verification_result = verify_document(
-                    document_type, file_path, "Aanchal", "Batra"
+                    document_type, file_path, "Mona", "Lisa"
                 )
                 create_document(file_path, ticket_id, document_type, verification_result, get_uuid(ticket_id))
 
