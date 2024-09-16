@@ -147,18 +147,43 @@ st.markdown("""
 
 def get_gmail_service():
     creds = None
-    if st.session_state.get('token'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
+
+    # Check if token is already saved in session state
+    if 'token' in st.session_state:
+        creds = Credentials.from_authorized_user_info(json.loads(st.session_state['token']), SCOPES)
+
+    # If credentials are not valid or don't exist, start OAuth process
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
+            # Refresh the token if it's expired
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        with open('token.json', 'w') as token:
-            token.write(creds.to_json())
-        st.session_state['token'] = creds.to_json()
+            # Use Device Flow to get authorization without requiring a browser
+            flow = Flow.from_client_secrets_file(
+                'credentials.json', scopes=SCOPES)
+            flow.redirect_uri = "urn:ietf:wg:oauth:2.0:oob"  # OOB redirect for device flow
+
+            # Generate authorization URL and prompt user
+            auth_url, _ = flow.authorization_url(prompt='consent')
+            st.write("Please go to the following URL to authorize the application:")
+            st.write(auth_url)
+
+            # Wait for user to enter the authorization code
+            code = st.text_input("Enter the authorization code:")
+
+            if code:
+                # Exchange the authorization code for credentials
+                flow.fetch_token(code=code)
+                creds = flow.credentials
+
+                # Save the credentials in session state
+                st.session_state['token'] = creds.to_json()
+
+                # Optionally, save credentials to a file (to persist across sessions)
+                with open('token.json', 'w') as token_file:
+                    token_file.write(creds.to_json())
+
+    # Return the Gmail service object
     return build('gmail', 'v1', credentials=creds)
 
 def get_document_table(verification_type):
