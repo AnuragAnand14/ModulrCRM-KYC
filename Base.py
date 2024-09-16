@@ -52,41 +52,41 @@ st.markdown("""
 
 
 def get_gmail_service():
-    # Load secrets from Streamlit's st.secrets
-    client_secrets = {
-        "installed": {
-            "client_id": st.secrets["client_id"],
-            "project_id": st.secrets["project_id"],
-            "auth_uri": st.secrets["auth_uri"],
-            "token_uri": st.secrets["token_uri"],
-            "auth_provider_x509_cert_url": st.secrets["auth_provider_x509_cert_url"],
-            "client_secret": st.secrets["client_secret"],
-            "redirect_uris": st.secrets["redirect_uris"]
-        }
-    }
+    # Load secrets from Streamlit
+    secrets = st.secrets["credentials"]
+    
+    client_id = secrets["installed.client_id"]
+    client_secret = secrets["installed.client_secret"]
+    auth_uri = secrets["installed.auth_uri"]
+    token_uri = secrets["installed.token_uri"]
+    auth_provider_x509_cert_url = secrets["installed.auth_provider_x509_cert_url"]
+    redirect_uris = secrets["installed.redirect_uris"]
 
-    # Save the client_secrets dict to a temporary JSON file
-    with open('client_secret.json', 'w') as secret_file:
-        json.dump(client_secrets, secret_file)
-
-    # OAuth flow
-    flow = InstalledAppFlow.from_client_secrets_file(
-        'client_secret.json', scopes=['https://www.googleapis.com/auth/gmail.send']
+    # Create the flow object
+    flow = InstalledAppFlow.from_client_config(
+        {
+            "installed": {
+                "client_id": client_id,
+                "client_secret": client_secret,
+                "auth_uri": auth_uri,
+                "token_uri": token_uri,
+                "auth_provider_x509_cert_url": auth_provider_x509_cert_url,
+                "redirect_uris": redirect_uris
+            }
+        },
+        scopes=['https://www.googleapis.com/auth/gmail.send']
     )
-
+    
     # Disable browser launch and print the auth URL instead
     auth_url, _ = flow.authorization_url(prompt='consent')
-    st.write(f"Please go to this URL: {auth_url}")
+    print(f"Please go to this URL: {auth_url}")
 
-    # Ask user for the authorization code manually in Streamlit
-    auth_code = st.text_input("Enter the authorization code:", "")
-
-    if auth_code:
-        flow.fetch_token(code=auth_code)
-        credentials = flow.credentials
-        return credentials
-    else:
-        st.warning("Please enter the authorization code.")
+    # Ask user for the authorization code manually
+    auth_code = input("Enter the authorization code: ")
+    flow.fetch_token(code=auth_code)
+    
+    credentials = flow.credentials
+    return credentials
 
 def get_document_table(verification_type):
     documents = {
