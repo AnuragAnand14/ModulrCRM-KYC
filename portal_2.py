@@ -42,7 +42,7 @@ def load_css(file_path):
         st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
 
 # Load CSS
-load_css('styles2.css')
+
 
 def is_valid_uuid(val):
     try:
