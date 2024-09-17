@@ -2,8 +2,9 @@ import streamlit as st
 import pandas as pd
 import uuid
 import os
-from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
+from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from email.mime.text import MIMEText
 from twilio.rest import Client
@@ -22,8 +23,18 @@ TWILIO_AUTH_TOKEN = st.secrets["TWILIO_AUTH_TOKEN"]
 # Gmail API setup
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
-# Twilio setup
-SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+# OAuth 2.0 client config
+CLIENT_CONFIG = {
+    "installed": {
+        "client_id": "332706202490-h116knoeu4apidjh6dj8khtvbk3a3uet.apps.googleusercontent.com",
+        "project_id": "total-dreamer-434811-e0",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_secret": "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",
+        "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob", "http://localhost"]
+    }
+}
 
 # Twilio setup
 twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
@@ -40,6 +51,7 @@ def get_db_connection():
 # Set page config for wide layout
 st.set_page_config(page_title="CRM", layout="wide")
 
+# CSS styling
 st.markdown("""
 <style>
     .stApp {
@@ -142,7 +154,6 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-
 def get_gmail_service():
     creds = None
     if 'token' in st.session_state:
@@ -151,13 +162,22 @@ def get_gmail_service():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            # For Streamlit Cloud, we'll use service account credentials
-            from google.oauth2 import service_account
-            creds = service_account.Credentials.from_service_account_info(
-                st.secrets["gcp_service_account"],
-                scopes=SCOPES
-            )
-        st.session_state['token'] = str(creds.to_json())
+            flow = Flow.from_client_config(
+                CLIENT_CONFIG,
+                scopes=SCOPES,
+                redirect_uri='urn:ietf:wg:oauth:2.0:oob')
+            
+            auth_url, _ = flow.authorization_url(prompt='consent')
+            
+            st.write("Please visit this URL to authorize the application:")
+            st.write(auth_url)
+            
+            code = st.text_input("Enter the authorization code:")
+            if code:
+                flow.fetch_token(code=code)
+                creds = flow.credentials
+                st.session_state['token'] = str(creds.to_json())
+    
     return build('gmail', 'v1', credentials=creds)
 
 def get_document_table(verification_type):
@@ -317,7 +337,7 @@ def main():
                     
                     email_body = f"""Hi {row['first_name']} {row['last_name']},
 
-We have reviewed your application for onboarding at Modulr.Please proceed for {verification_type} verification. Upload the following documents to proceed further:
+We have reviewed your application for onboarding at Modulr. Please proceed for {verification_type} verification. Upload the following documents to proceed further:
 
 {doc_table}
 
