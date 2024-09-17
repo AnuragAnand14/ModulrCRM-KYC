@@ -5,24 +5,24 @@ import os
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from google.auth.transport.requests import Request
-from google_auth_oauthlib.flow import InstalledAppFlow
-import base64
 from email.mime.text import MIMEText
 from twilio.rest import Client
 import psycopg2
 from psycopg2.extras import RealDictCursor
-from dotenv import load_dotenv
-import json
+import base64
 
-# Load environment variables from Streamlit secrets
-DB_HOST = st.secrets['DB_HOST']
-DB_NAME = st.secrets['DB_NAME']
-DB_USER = st.secrets['DB_USER']
-DB_PASSWORD = st.secrets['DB_PASSWORD']
-TWILIO_ACCOUNT_SID = st.secrets['TWILIO_ACCOUNT_SID']
-TWILIO_AUTH_TOKEN = st.secrets['TWILIO_AUTH_TOKEN']
+# Retrieve environment variables from Streamlit secrets
+DB_HOST = st.secrets["DB_HOST"]
+DB_NAME = st.secrets["DB_NAME"]
+DB_USER = st.secrets["DB_USER"]
+DB_PASSWORD = st.secrets["DB_PASSWORD"]
+TWILIO_ACCOUNT_SID = st.secrets["TWILIO_ACCOUNT_SID"]
+TWILIO_AUTH_TOKEN = st.secrets["TWILIO_AUTH_TOKEN"]
 
 # Gmail API setup
+SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+
+# Twilio setup
 SCOPES = ['https://www.googleapis.com/auth/gmail.send']
 
 # Twilio setup
@@ -40,53 +40,125 @@ def get_db_connection():
 # Set page config for wide layout
 st.set_page_config(page_title="CRM", layout="wide")
 
-# CSS styling
 st.markdown("""
 <style>
     .stApp {
         background-color: #f0f2f6;
     }
-    /* Add other CSS styles */
+    .main {
+        padding: 1rem;
+    }
+    h1, h2, h3, h4 {
+        color: #000000;
+        margin-bottom: 0.5rem;
+    }
+    .stButton > button {
+        width: 100%;
+        padding: 0.5rem;
+        font-size: 0.85rem;
+        background-color: #3B82F6;
+        color: white;
+        font-weight: bold;
+        border-radius: 5px;
+    }
+    .stButton > button:hover {
+        background-color: #2563EB;
+    }
+    .customer-card {
+        background-color: white;
+        padding: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+    }
+    .customer-info {
+        margin-bottom: 0.5rem;
+    }
+    .ticket-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+    .ticket-card {
+        background-color: #f8fafc;
+        padding: 0.75rem;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+    }
+    .ticket-header {
+        font-weight: bold;
+        color: #1E3A8A;
+        margin-bottom: 0.5rem;
+    }
+    .ticket-info {
+        margin-bottom: 0.25rem;
+        font-size: 0.9rem;
+    }
+    .contact-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .contact-buttons .stButton {
+        flex: 1;
+    }
+    .stExpanderHeader {
+        font-weight: bold;
+        font-size: 1.1rem;
+        color: #1E3A8A;
+        background-color: #f0f2f6;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+    }
+    .stExpander {
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+    .dataframe-container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        padding: 15px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-top: 10px;
+    }
+    .dataframe-table th {
+        background-color: #1E3A8A !important;
+        color: white !important;
+        font-weight: bold !important;
+        font-size: 18px !important;
+        padding: 10px !important;
+        border-bottom: 1px solid #ddd !important;
+    }
+    .dataframe-table td {
+        padding: 8px !important;
+        font-size: 18px !important;
+        color: #333 !important;
+        border-bottom: 1px solid #ddd !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
 
 def get_gmail_service():
-    # Load secrets from Streamlit
-    secrets = st.secrets["credentials"]
-    
-    client_id = secrets["installed.client_id"]
-    client_secret = secrets["installed.client_secret"]
-    auth_uri = secrets["installed.auth_uri"]
-    token_uri = secrets["installed.token_uri"]
-    auth_provider_x509_cert_url = secrets["installed.auth_provider_x509_cert_url"]
-    redirect_uris = secrets["installed.redirect_uris"]
-
-    # Create the flow object
-    flow = InstalledAppFlow.from_client_config(
-        {
-            "installed": {
-                "client_id": client_id,
-                "client_secret": client_secret,
-                "auth_uri": auth_uri,
-                "token_uri": token_uri,
-                "auth_provider_x509_cert_url": auth_provider_x509_cert_url,
-                "redirect_uris": redirect_uris
-            }
-        },
-        scopes=['https://www.googleapis.com/auth/gmail.send']
-    )
-    
-    # Disable browser launch and print the auth URL instead
-    auth_url, _ = flow.authorization_url(prompt='consent')
-    print(f"Please go to this URL: {auth_url}")
-
-    # Ask user for the authorization code manually
-    auth_code = input("Enter the authorization code: ")
-    flow.fetch_token(code=auth_code)
-    
-    credentials = flow.credentials
-    return credentials
+    creds = None
+    if 'token' in st.session_state:
+        creds = Credentials.from_authorized_user_info(eval(st.session_state['token']), SCOPES)
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            # For Streamlit Cloud, we'll use service account credentials
+            from google.oauth2 import service_account
+            creds = service_account.Credentials.from_service_account_info(
+                st.secrets["gcp_service_account"],
+                scopes=SCOPES
+            )
+        st.session_state['token'] = str(creds.to_json())
+    return build('gmail', 'v1', credentials=creds)
 
 def get_document_table(verification_type):
     documents = {
