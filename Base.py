@@ -365,7 +365,7 @@ Your ticket number is: {ticket['id']}
 
 Thank you"""
                     
-                    if send_email(row['email'], "Document Upload Request", email_body):
+                 if send_email(row['email'], "Document Upload Request", email_body):
                         st.success(f"Email sent to {row['email']}!")
                 
                     if st.button("Contact via WhatsApp", key=f"whatsapp_{row['id']}"):
