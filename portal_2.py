@@ -23,8 +23,7 @@ from urllib.parse import urlparse, parse_qs
 from pdf2image import convert_from_bytes
 import io 
 
-# Adjust PATH for Homebrew
-os.environ['PATH'] += os.pathsep + '/opt/homebrew/bin'
+
 
 # Streamlit page configuration
 st.set_page_config(page_title="Document Upload Portal", layout="wide")
