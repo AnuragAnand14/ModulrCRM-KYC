@@ -22,7 +22,7 @@ import io
 
 # Adjust PATH for Homebrew
 def load_secrets():
-secrets = st.secrets["document_validator"]     
+  secrets = st.secrets["document_validator"]     
 return secrets
 
 secrets = load_secrets()
