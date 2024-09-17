@@ -311,9 +311,28 @@ def main():
         conn.close()
 
     tickets = fetch_tickets()
+    st.write(f"Debug: Number of tickets fetched: {len(tickets)}")  # Debug line
+    st.write("Debug: First ticket:", tickets[0] if tickets else "No tickets")  # Debug line
 
     if st.button("Contact All Users"):
         send_trigger_to_all(df)
+
+    # Display tickets in a dropdown
+    st.subheader("Existing Tickets")
+    if tickets:
+        selected_ticket = st.selectbox(
+            "Select a ticket to view details:",
+            options=[f"Ticket {t['id']}: {t['ticket_type']} - {t['status']}" for t in tickets],
+            format_func=lambda x: x
+        )
+        if selected_ticket:
+            ticket_id = int(selected_ticket.split(':')[0].split()[1])
+            selected_ticket_details = next((t for t in tickets if t['id'] == ticket_id), None)
+            if selected_ticket_details:
+                st.write(f"Ticket Details:")
+                st.json(selected_ticket_details)
+    else:
+        st.write("No tickets found.")
 
     st.subheader("Customer Details")
     for _, row in df.iterrows():
@@ -349,7 +368,7 @@ Thank you"""
                     if send_email(row['email'], "Document Upload Request", email_body):
                         st.success(f"Email sent to {row['email']}!")
                 
-                if st.button("Contact via WhatsApp", key=f"whatsapp_{row['id']}"):
+                    if st.button("Contact via WhatsApp", key=f"whatsapp_{row['id']}"):
                     ticket = create_ticket(row)
                     unique_link = f"https://mjd3mtr4-8502.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
                     verification_type = row.get('verification_type', row.get('product_type', 'Default'))
@@ -375,6 +394,20 @@ Thank you"""
 
             st.markdown('</div>', unsafe_allow_html=True)
             st.markdown('</div>', unsafe_allow_html=True)
+
+        # Display tickets for this customer
+        customer_tickets = [t for t in tickets if t['user_id'] == row['id']]
+        if customer_tickets:
+            st.markdown(f"<h4>Tickets for {row['first_name']} {row['last_name']}</h4>", unsafe_allow_html=True)
+            for ticket in customer_tickets:
+                st.markdown(f"<div class='ticket-card'>", unsafe_allow_html=True)
+                st.markdown(f"<p><strong>Ticket ID:</strong> {ticket['id']}</p>", unsafe_allow_html=True)
+                st.markdown(f"<p><strong>Type:</strong> {ticket['ticket_type']}</p>", unsafe_allow_html=True)
+                st.markdown(f"<p><strong>Status:</strong> {ticket['status']}</p>", unsafe_allow_html=True)
+                st.markdown(f"<p><strong>Created At:</strong> {ticket['created_at']}</p>", unsafe_allow_html=True)
+                st.markdown("</div>", unsafe_allow_html=True)
+        else:
+            st.write(f"No tickets found for {row['first_name']} {row['last_name']}")
 
 if __name__ == "__main__":
     main()
