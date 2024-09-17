@@ -22,12 +22,7 @@ import io
 
 # Adjust PATH for Homebrew
 def load_secrets():
-    # Check if running on Streamlit Cloud
-       'STREAMLIT_RUN_ON_SAVE' in os.environ:
-        # Use Streamlit secrets
-        secrets = st.secrets["document_validator"]
-    
-        
+        secrets = st.secrets["document_validator"]     
     return secrets
 
 secrets = load_secrets()
