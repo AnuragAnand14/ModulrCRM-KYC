@@ -23,18 +23,10 @@ import io
 # Adjust PATH for Homebrew
 def load_secrets():
     # Check if running on Streamlit Cloud
-    if 'STREAMLIT_RUN_ON_SAVE' in os.environ:
+       'STREAMLIT_RUN_ON_SAVE' in os.environ:
         # Use Streamlit secrets
         secrets = st.secrets["document_validator"]
-    else:
-        # Load from .env file for local development
-        load_dotenv('.env')
-        secrets = {
-            "database_host": os.getenv("DATABASE_HOST"),
-            "database_name": os.getenv("DATABASE_NAME"),
-            "database_user": os.getenv("DATABASE_USER"),
-            "database_password": os.getenv("DATABASE_PASSWORD"),
-            "openai_api_key": os.getenv("OPENAI_API_KEY"),
+    
         }
     return secrets
 
