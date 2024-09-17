@@ -27,7 +27,7 @@ def load_secrets():
         # Use Streamlit secrets
         secrets = st.secrets["document_validator"]
     
-        }
+        
     return secrets
 
 secrets = load_secrets()
