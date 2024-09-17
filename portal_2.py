@@ -22,7 +22,9 @@ from psycopg2 import sql
 from urllib.parse import urlparse, parse_qs
 from pdf2image import convert_from_bytes
 import io 
+from dotenv import load_dotenv
 
+load_dotenv()
 # Adjust PATH for Homebrew
 os.environ['PATH'] += os.pathsep + '/opt/homebrew/bin'
 
