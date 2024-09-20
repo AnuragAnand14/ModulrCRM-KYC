@@ -556,8 +556,7 @@ def main():
       st.image(
         "https://www.blenheimchalcot.com/wp-content/uploads/2018/07/salary-finance-logo-vector.svg",
         width=125)
-
-    st.markdown(
+      st.markdown(
         """
         <div class="footer">
             Disclaimer: All documents used in this demo are either AI-generated or pseudonymized.
