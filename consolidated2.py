@@ -20,20 +20,24 @@ from urllib.parse import urlparse, parse_qs
 from pdf2image import convert_from_bytes
 import io
 from dotenv import load_dotenv
-load_dotenv("myenv/.env")
-st.set_page_config(page_title="DocVal", layout="wide")
+def load_secrets():
+  secrets = st.secrets["document_validator"]     
+  return secrets
+
+secrets = load_secrets()
+
 # Database connection
 connection = psycopg2.connect(
-    host=os.getenv("DB_HOST"),
-    database=os.getenv("DB_NAME"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD")
+    host=secrets["database_host"],
+    database=secrets["database_name"],
+    user=secrets["database_user"],
+    password=secrets["database_password"]
 )
 cursor = connection.cursor()
 
 # Set up OpenAI API key
-openai.api_key = os.getenv("OPENAI_API_KEY")
-os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+openai.api_key = secrets["openai_api_key"]
+os.environ["OPENAI_API_KEY"] = secrets["openai_api_key"]
 
 
 # Helper functions
