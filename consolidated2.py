@@ -552,11 +552,15 @@ def create_document(doc_path, ticketid, document_type, verification_result, user
 
 
 def main():
+    col1, col2 = st.columns([1,8])
+    with col2:
       st.title("Document Validator")
+    with col1:
       st.image(
         "https://www.blenheimchalcot.com/wp-content/uploads/2018/07/salary-finance-logo-vector.svg",
         width=125)
-      st.markdown(
+
+    st.markdown(
         """
         <div class="footer">
             Disclaimer: All documents used in this demo are either AI-generated or pseudonymized.
