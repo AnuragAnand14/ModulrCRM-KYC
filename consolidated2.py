@@ -67,8 +67,8 @@ st.markdown("""
     left: 0;
     bottom: 0;
     width: 100%;
-    background-color: #ffe224;
-    color: #000000;
+    background-color: #FF474D;
+    color: #ffffff;
     text-align: center;
     padding: 10px 0;
     font-size: 0.8rem;
@@ -552,10 +552,7 @@ def create_document(doc_path, ticketid, document_type, verification_result, user
 
 
 def main():
-    col1, col2 = st.columns([1,8])
-    with col2:
       st.title("Document Validator")
-    with col1:
       st.image(
         "https://www.blenheimchalcot.com/wp-content/uploads/2018/07/salary-finance-logo-vector.svg",
         width=125)
