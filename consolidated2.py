@@ -38,6 +38,7 @@ cursor = connection.cursor()
 # Set up OpenAI API key
 openai.api_key = secrets["openai_api_key"]
 os.environ["OPENAI_API_KEY"] = secrets["openai_api_key"]
+st.set_page_config(page_title="2", layout="wide")
 
 
 # Helper functions
