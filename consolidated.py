@@ -553,13 +553,13 @@ def create_document(doc_path, ticketid, document_type, verification_result, user
 
 
 def main():
-    col1, col2 = st.columns([1,8])
+    col1, col2 = st.columns([1,6])
     with col2:
       st.title("Document Validator")
     with col1:
       st.image(
         "https://www.blenheimchalcot.com/wp-content/uploads/2022/01/OakbrookGroup_Landscape_OnLight_RGB.png",
-        width=175)
+        width=200)
 
     st.markdown(
         """
