@@ -92,7 +92,7 @@ st.markdown("""
     transition: all 0.3s ease;
 }
 .stFileUploader > div:hover {
-    background-color: #ffe224;
+    background-color: #514fff;
 }
 /* Buttons */
 .stButton > button {
