@@ -38,7 +38,7 @@ cursor = connection.cursor()
 # Set up OpenAI API key
 openai.api_key = secrets["openai_api_key"]
 os.environ["OPENAI_API_KEY"] = secrets["openai_api_key"]
-st.set_page_config(page_title="2", layout="wide")
+st.set_page_config(page_title="OBF", layout="wide")
 
 
 # Helper functions
@@ -68,7 +68,7 @@ st.markdown("""
     left: 0;
     bottom: 0;
     width: 100%;
-    background-color: #FF474D;
+    background-color: #514fff;
     color: #ffffff;
     text-align: center;
     padding: 10px 0;
@@ -558,7 +558,7 @@ def main():
       st.title("Document Validator")
     with col1:
       st.image(
-        "https://www.blenheimchalcot.com/wp-content/uploads/2018/07/salary-finance-logo-vector.svg",
+        "https://www.blenheimchalcot.com/wp-content/uploads/2022/01/OakbrookGroup_Landscape_OnLight_RGB.png",
         width=125)
 
     st.markdown(
