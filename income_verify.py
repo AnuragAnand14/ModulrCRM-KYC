@@ -17,7 +17,7 @@ from langchain_community.document_loaders import PyPDFLoader
 from langchain_core.pydantic_v1 import BaseModel, Field
 
 
-load_dotenv('myenv/.env')
+load_dotenv()
 OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY')
 openai.api_key = OPENAI_API_KEY
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
@@ -143,7 +143,7 @@ def checkbankstatement(file_path) :
         return "Incorrect Document Uploaded"
     else :
         
-        if response.has_empty_fields() :
+        if response.has_empty_fields()
             return "reupload better image"
         
         #logic for comparing given first and last name to db

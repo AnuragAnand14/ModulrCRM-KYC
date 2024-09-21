@@ -99,6 +99,7 @@ def save_uploaded_file(uploaded_file, folder_path, save_name):
             save_name += file_extension
         os.makedirs(folder_path, exist_ok=True)
         file_path = os.path.join(folder_path, save_name)
+        print("Anurag" ,file_path)
         with open(file_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
         return file_path
