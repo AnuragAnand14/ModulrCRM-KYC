@@ -559,7 +559,7 @@ def main():
     with col1:
       st.image(
         "https://www.blenheimchalcot.com/wp-content/uploads/2022/01/OakbrookGroup_Landscape_OnLight_RGB.png",
-        width=125)
+        width=175)
 
     st.markdown(
         """
