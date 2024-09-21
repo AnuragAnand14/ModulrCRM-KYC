@@ -1,0 +1,126 @@
+
+
+/* Divider */
+.stApp hr {
+    border-top: 2px solid #3498db;
+    margin: 2rem 0;
+}
+/* Input fields */
+.stTextInput > div > div > input {
+    border: 2px solid #278ccf;
+    border-radius: 5px;
+    padding: 0.5rem;
+    font-size: 1rem;
+}
+.footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: #ffffff;
+    color: #000000;
+    text-align: center;
+    padding: 10px 0;
+    font-size: 0.8rem;
+    border-top: 1px solid #d1d5db;
+}
+/* Selectbox */
+.stSelectbox {
+    margin-bottom: 1rem;
+}
+.stSelectbox > div > div > div {
+    border: 2px solid #3498db;
+    border-radius: 5px;
+}
+/* File uploader */
+.stFileUploader > div {
+    border: 2px dashed #3498db;
+    border-radius: 10px;
+    padding: 2rem;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+.stFileUploader > div:hover {
+    background-color: #ffe224;
+}
+/* Buttons */
+.stButton > button {
+    background-color: #ffe224;
+    color: rgb(0, 0, 0);
+    border: none;
+    border-radius: 5px;
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+.stButton > button:hover {
+    background-color: #2980b9;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+/* Success message */
+.stSuccess {
+    background-color: #2ecc71;
+    color: white;
+    padding: 1rem;
+    border-radius: 5px;
+    font-weight: 600;
+}
+/* Warning message */
+.stWarning {
+    background-color: #98620c;
+    color: rgb(8, 6, 6);
+    padding: 1rem;
+    border-radius: 5px;
+    font-weight: 600;
+}
+/* Error message */
+.stError {
+    background-color: #e74c3c;
+    color: white;
+    padding: 1rem;
+    border-radius: 5px;
+    font-weight: 600;
+}
+/* Info message */
+.stInfo {
+    background-color: #3498db;
+    color: white;
+    padding: 1rem;
+    border-radius: 5px;
+    font-weight: 600;
+}
+/* Image and PDF preview */
+.stImage > img {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+/* Responsive design */
+@media (max-width: 768px) {
+    .stApp header .stTitle {
+        font-size: 2rem;
+    }
+    .stFileUploader > div {
+        padding: 1rem;
+    }
+}
+/* Custom header with logo */
+.custom-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #2c3e50;
+    padding: 1rem;
+}
+.custom-header img {
+    height: 50px;
+    margin-right: 1rem;
+}
+.custom-header h1 {
+    color: r#2073f9;
+    font-size: 2.5rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
