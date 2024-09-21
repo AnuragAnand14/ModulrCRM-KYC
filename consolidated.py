@@ -19,7 +19,7 @@ from psycopg2 import sql
 from urllib.parse import urlparse, parse_qs
 from pdf2image import convert_from_bytes
 import io 
-st.set_page_config(page_title="CRM", layout="wide")
+st.set_page_config(page_title="1", layout="wide")
 
 # Adjust PATH for Homebrew
 def load_secrets():
