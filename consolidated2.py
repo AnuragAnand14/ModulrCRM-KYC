@@ -38,7 +38,7 @@ cursor = connection.cursor()
 # Set up OpenAI API key
 openai.api_key = secrets["openai_api_key"]
 os.environ["OPENAI_API_KEY"] = secrets["openai_api_key"]
-st.set_page_config(page_title="2", layout="wide")
+st.set_page_config(page_title="SalaryFinance", layout="wide")
 
 
 # Helper functions
@@ -107,7 +107,7 @@ st.markdown("""
     transition: all 0.3s ease;
 }
 .stButton > button:hover {
-    background-color: #2980b9;
+    background-color: #FF474D;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 /* Success message */
