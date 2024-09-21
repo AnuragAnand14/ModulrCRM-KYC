@@ -19,6 +19,7 @@ from psycopg2 import sql
 from urllib.parse import urlparse, parse_qs
 from pdf2image import convert_from_bytes
 import io 
+st.set_page_config(page_title="CRM", layout="wide")
 
 # Adjust PATH for Homebrew
 def load_secrets():
@@ -383,7 +384,7 @@ def create_document(doc_path, ticketid, document_type, verification_result, user
     connection.commit()
 
 def main():
-    st.image("https://cdn.asp.events/CLIENT_CL_Conf_BDA05934_5056_B731_4C9EEBBE0C2416C2/sites/PayExpo-2020/media/libraries/sponsor/Modulr-Logo-CMYK-420x155.png/fit-in/700x9999/filters:no_upscale()", width=200)
+    st.image("https://www.blenheimchalcot.com/wp-content/uploads/2022/01/OakbrookGroup_Landscape_OnLight_RGB.png", width=200)
     st.title("Document Validator")
     st.markdown(
         """
