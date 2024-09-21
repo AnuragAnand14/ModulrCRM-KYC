@@ -553,7 +553,7 @@ def create_document(doc_path, ticketid, document_type, verification_result, user
 
 
 def main():
-    col1, col2 = st.columns([1,6])
+    col1, col2 = st.columns([1,5])
     with col2:
       st.title("Document Validator")
     with col1:
