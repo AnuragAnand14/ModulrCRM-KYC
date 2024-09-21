@@ -410,17 +410,26 @@ def checkpayslip(file_path):
 
 
 def checkbankstatement(file_path):
-    loader = PyPDFLoader(file_path)
-    pages = loader.load_and_split()
-    text = " ".join(list(map(lambda page: page.page_content, pages)))
+    doc = fitz.open(file_path)
+    text = ""
+    
+    # Iterate through the pages and extract text
+    for page_num in range(len(doc)):
+        page = doc.load_page(page_num)  # Load each page
+        text += page.get_text("text")   # Extract text from the page
+    
+    # Assuming you have the `model` and `BankStatement` already defined
     structured_model = model.with_structured_output(BankStatement)
     response = structured_model.invoke(text)
+    
     if response.Verification == False:
-        return -1
+        return "Incorrect Document Uploaded"
     else:
         if response.has_empty_fields():
-            return 0
-        return 1 if is_difference_at_least_sixty_days(response.Firstdate, response.Lastdate) else 0
+            return "Reupload better image"
+        
+        #logic for comparing given first and last name to db
+        return is_difference_at_least_sixty_days(response.Firstdate, response.Lastdate)
 
 
 def passport_verify(image_path, first_name, last_name):
