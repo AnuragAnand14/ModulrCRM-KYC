@@ -1,35 +1,30 @@
-import streamlit as st
-import pandas as pd
-import uuid
+
 import os
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
-from google.auth.transport.requests import Request
-from google_auth_oauthlib.flow import InstalledAppFlow
-import base64
 from email.mime.text import MIMEText
-from twilio.rest import Client
+import smtplib
+from email.mime.multipart import MIMEMultipart
+import ssl
+import certifi
+import pandas as pd
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import streamlit as st
 from dotenv import load_dotenv
+from twilio.rest import Client
 
-# Load environment variables from .env filexx
-load_dotenv("myenv/.env")
+# Load environment variables from .env file
+
 st.set_page_config(page_title="CRM", layout="wide")
-# Retrieve environment variables
-DB_HOST = os.getenv('DB_HOST')
-DB_NAME = os.getenv('DB_NAME')
-DB_USER = os.getenv('DB_USER')
-DB_PASSWORD = os.getenv('DB_PASSWORD')
-TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID')
-TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN')
 
-# Gmail API setup
-SCOPES = ['https://www.googleapis.com/auth/gmail.send']
+DB_HOST = st.secrets["db"]["DB_HOST"]
+DB_NAME = st.secrets["db"]["DB_NAME"]
+DB_USER = st.secrets["db"]["DB_USER"]
+DB_PASSWORD = st.secrets["db"]["DB_PASSWORD"]
+TWILIO_ACCOUNT_SID = st.secrets["twilio"]["TWILIO_ACCOUNT_SID"]
+TWILIO_AUTH_TOKEN = st.secrets["twilio"]["TWILIO_AUTH_TOKEN"]
 
 # Twilio setup
 twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
-
 
 # PostgreSQL connection
 def get_db_connection():
@@ -39,11 +34,6 @@ def get_db_connection():
         user=DB_USER,
         password=DB_PASSWORD
     )
-
-
-# Set page config for wide layout
-
-
 # CSS styling
 st.markdown("""
 <style>
@@ -144,38 +134,53 @@ st.markdown("""
         color: #333 !important;
         border-bottom: 1px solid #ddd !important;
     }
+    .sidebar .company-button {
+        width: 100%;
+        margin-bottom: 10px;
+        color: white;
+        border: none;
+        padding: 10px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 4px;
+    }
+    .sidebar .obf-button {
+        background-color: #3B82F6;
+    }
+    .sidebar .modulr-button {
+        background-color: black;
+    }
+    .sidebar .salary-finance-button {
+        background-color: #FF6B6B;
+    }
+    .company-button:hover {
+        opacity: 0.8;
+    }
+    .sidebar .company-button {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
 </style>
 """, unsafe_allow_html=True)
 
 
-def get_gmail_service():
-    creds = None
-    if st.session_state.get('token'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        with open('token.json', 'w') as token:
-            token.write(creds.to_json())
-        st.session_state['token'] = creds.to_json()
-    return build('gmail', 'v1', credentials=creds)
-
-
-def get_document_table(verification_type):
+def get_document_table(product_type):
+    # Define document requirements based on the product_type
     documents = {
         "Income": [
             "Payslip",
             "Bank Statement"
         ],
-        "Fraud": [
+        "POI": [
             "Passport",
             "Driving License"
         ],
-        "Both": [
+        "income and POI": [
             "Payslip",
             "Bank Statement",
             "Passport",
@@ -190,8 +195,10 @@ def get_document_table(verification_type):
         ]
     }
 
-    doc_list = documents.get(verification_type, documents["Default"])
+    # Get the document list based on the product_type
+    doc_list = documents.get(product_type, documents["Default"])
 
+    # Format the document table
     table = "Required Documents: \n"
     for doc in doc_list:
         table += f" -> {doc} \n"
@@ -199,29 +206,47 @@ def get_document_table(verification_type):
     return table
 
 
+
 def send_email(to_email, subject, body):
-    service = get_gmail_service()
-    message = MIMEText(body)
-    message['to'] = to_email
-    message['subject'] = subject
-    raw_message = base64.urlsafe_b64encode(message.as_bytes()).decode('utf-8')
+    smtp_server = "smtp.gmail.com"  # Gmail's SMTP server (or your preferred SMTP server)
+    smtp_port = 465  # For SSL
+    sender_email = "mteam8826@gmail.com"
+    sender_password = "cypi hvja csyq abcs"  # Use an app password if using Gmail
+
+    # Create the email
+    message = MIMEMultipart()
+    message['From'] = sender_email
+    message['To'] = to_email
+    message['Subject'] = subject
+
+    # Attach the body to the email
+    message.attach(MIMEText(body, 'plain'))
+
+    # Try to send the email
     try:
-        service.users().messages().send(userId='me', body={'raw': raw_message}).execute()
+        # Create an SSL context with a manually specified CA bundle
+        context = ssl.create_default_context(cafile=certifi.where())
+
+        # Connect to the SMTP server and send the email
+        with smtplib.SMTP_SSL(smtp_server, smtp_port, context=context) as server:
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, to_email, message.as_string())
         return True
+
     except Exception as e:
         print(f"An error occurred: {e}")
         return False
 
 
-def create_ticket(row):
+def create_ticket(row, company):
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
     try:
         cur.execute("""
-            INSERT INTO obf_tickets (user_id, ticket_type, created_at, status, comments)
-            VALUES (%s, %s, NOW(), 'Pending', %s)
-            RETURNING id, ticket_type, created_at, status
-        """, (row['id'], row['ticket_type'], "Awaiting document upload"))
+            INSERT INTO obf_tickets (user_id, ticket_type, created_at, status, comments, company)
+            VALUES (%s, %s, NOW(), 'Pending', %s, %s)
+            RETURNING id, ticket_type, created_at, status, company
+        """, (row['id'], row['ticket_type'], "Awaiting document upload", company))
         ticket = cur.fetchone()
         conn.commit()
         return ticket
@@ -230,12 +255,22 @@ def create_ticket(row):
         conn.close()
 
 
-def fetch_tickets():
+def fetch_tickets(company):
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
     try:
-        cur.execute("SELECT * FROM obf_tickets WHERE deleted_at IS NULL")
+        query = """
+        SELECT t.*
+        FROM obf_tickets t
+        JOIN obf_users u ON t.user_id = u.id
+        WHERE t.deleted_at IS NULL
+        AND t.company = %s
+        """
+        cur.execute(query, (company,))
         return cur.fetchall()
+    except Exception as e:
+        print(f"Error fetching tickets: {e}")
+        return []
     finally:
         cur.close()
         conn.close()
@@ -254,28 +289,83 @@ def send_whatsapp_message(to_number, message):
         return False, f"Error sending WhatsApp message: {e}"
 
 
-def send_trigger_to_all(df):
-    for _, row in df.iterrows():
-        ticket = create_ticket(row)
-        unique_link = f"https://mjd3mtr4-8502.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
+def get_company_specific_link(company, ticket_id):
+    base_urls = {
+        "OBF": "https://obfdocvalidator.streamlit.app",
+        "Modulr": "https://modulr-doc-validator-e0c8fucjbwe2edef.uksouth-01.azurewebsites.net",
+        "Salary Finance": "https://salaryfinanacedocvalidator.streamlit.app"
+    }
+    base_url = base_urls.get(company, "https://default-validator.example.com")
+    return f"{base_url}/?ticket_id={ticket_id}"
 
-        # Use 'verification_type' instead of 'product_type'
-        verification_type = row.get('verification_type', row.get('product_type', 'Default'))
-        doc_table = get_document_table(verification_type)
 
-        message = f"""Hi {row['first_name']} {row['last_name']},
+def get_company_specific_message(company, row, ticket, unique_link):
+    verification_type = row.get('verification_type', row.get('product_type', 'Default'))
+    doc_table = get_document_table(verification_type)
 
-We have reviewed your application for {verification_type} verification and request you to upload the following documents to proceed further:
+    if company == "OBF":
+        return f"""Hi {row['first_name']} {row['last_name']},
+
+OakBrook Finance has reviewed your application for a Loan and we would like to proceed with {verification_type} verification. To continue with the process, kindly upload the required documents listed below:
+
+{doc_table}
+
+Upload link: {unique_link}
+Ticket number: {ticket['id']}
+
+Thank you for choosing OakBrook Finance. We look forward to assisting you further."""
+
+    elif company == "Modulr":
+        return f"""Dear {row['first_name']} {row['last_name']},
+
+Modulr has processed your onboarding application. For {verification_type} verification, we require the following documents:
+
+{doc_table}
+
+Please use this secure link to upload: {unique_link}
+Your reference number is: {ticket['id']}
+
+We appreciate your cooperation in ensuring a smooth onboarding process.
+
+Best regards,
+Modulr Team"""
+
+    elif company == "Salary Finance":
+        return f"""Hello {row['first_name']} {row['last_name']},
+
+Salary Finance is now  ready to onboard you. Kindly proceed with your {verification_type} verification. Please submit the following documents:
+
+{doc_table}
+
+Secure upload link: {unique_link}
+Case ID: {ticket['id']}
+
+If you have any questions, our support team is here to help.
+
+Warm regards,
+Salary Finance Team"""
+
+    else:
+        return f"""Hi {row['first_name']} {row['last_name']},
+
+We have reviewed your application for {verification_type} verification and request you to upload the following documents:
 
 {doc_table}
 
 Please use this link to upload: {unique_link}
-
 Your ticket number is: {ticket['id']}
 
 Thank you"""
 
-        if send_email(row['email'], "Document Upload Request", message):
+
+def send_trigger_to_all(df, company):
+    for _, row in df.iterrows():
+        ticket = create_ticket(row, company)
+        unique_link = get_company_specific_link(company, ticket['id'])
+
+        message = get_company_specific_message(company, row, ticket, unique_link)
+
+        if send_email(row['email'], f"Document Upload Request - {company}", message):
             st.success(f"Email sent to {row['email']}!")
 
         success, result = send_whatsapp_message(row['phone_number'], message)
@@ -285,24 +375,14 @@ Thank you"""
             st.error(result)
 
 
-def main():
-    # Add logo and title in a horizontal layout
-    col1, col2 = st.columns([1, 6])
-    with col1:
-        st.image("https://www.blenheimchalcot.com/wp-content/uploads/2018/07/modulr-finance-limited-logo-vector.svg",
-                 width=200)
-    with col2:
-        st.title("Customer Relationship Management Portal")
-
-    st.markdown("---")
-
+def display_main_content(company):
     # Load data from the database
     conn = get_db_connection()
     cur = conn.cursor(cursor_factory=RealDictCursor)
     try:
         cur.execute("SELECT * FROM obf_users WHERE deleted_at IS NULL AND is_active = TRUE")
         df = pd.DataFrame(cur.fetchall())
-        st.success("Customer Details Fetched Succesfully")
+        st.success("Customer Details Fetched Successfully")
     except Exception as e:
         st.error(f"Error Loading Customer Data: {e}")
         return
@@ -310,12 +390,12 @@ def main():
         cur.close()
         conn.close()
 
-    # Fetch tickets from the database
-    tickets = fetch_tickets()
+    # Fetch tickets from the database for the specific company
+    tickets = fetch_tickets(company)
 
     # Button to send trigger to all
     if st.button("Contact All Users"):
-        send_trigger_to_all(df)
+        send_trigger_to_all(df, company)
 
     # Display all customer details with individual trigger buttons
     st.subheader("Customer Details")
@@ -333,45 +413,25 @@ def main():
                 st.markdown(f'<div class="customer-info"><strong>Phone:</strong> {row["phone_number"]}</div>',
                             unsafe_allow_html=True)
             with col2:
-                # Use 'verification_type' if it exists, otherwise fall back to 'product_type'
                 verification_type = row.get('verification_type', row.get('product_type', 'Unknown'))
                 st.markdown(f'<div class="customer-info"><strong>Verification Type:</strong> {verification_type}</div>',
                             unsafe_allow_html=True)
             with col3:
                 st.markdown('<div class="contact-buttons">', unsafe_allow_html=True)
                 if st.button("Contact via Email", key=f"email_{row['id']}"):
-                    ticket = create_ticket(row)
-                    unique_link = f"https://mjd3mtr4-8502.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
+                    ticket = create_ticket(row, company)
+                    unique_link = get_company_specific_link(company, ticket['id'])
 
-                    verification_type = row.get('verification_type', row.get('product_type', 'Default'))
-                    doc_table = get_document_table(verification_type)
+                    email_body = get_company_specific_message(company, row, ticket, unique_link)
 
-                    email_body = f"""Hi {row['first_name']} {row['last_name']},
-
-We have reviewed your application for onboarding at Modulr.Please proceed for {verification_type} verification. Upload the following documents to proceed further:
-
-{doc_table}
-
-Please use this link to upload: {unique_link}
-Your ticket number is: {ticket['id']}
-
-Thank you"""
-
-                    if send_email(row['email'], "Document Upload Request", email_body):
+                    if send_email(row['email'], f"Document Upload Request - {company}", email_body):
                         st.success(f"Email sent to {row['email']}!")
 
                 if st.button("Contact via WhatsApp", key=f"whatsapp_{row['id']}"):
-                    ticket = create_ticket(row)
-                    unique_link = f"https://mjd3mtr4-8502.inc1.devtunnels.ms/?ticket_id={ticket['id']}"
+                    ticket = create_ticket(row, company)
+                    unique_link = get_company_specific_link(company, ticket['id'])
 
-                    whatsapp_message = f"""Hi {row['first_name']} {row['last_name']},
-
-We have reviewed your application for {row['product_type']} and request you to upload documents to proceed further.
-
-Please use this link to upload: {unique_link}
-Your ticket number is: {ticket['id']}
-
-Thank you"""
+                    whatsapp_message = get_company_specific_message(company, row, ticket, unique_link)
 
                     success, result = send_whatsapp_message(row['phone_number'], whatsapp_message)
                     if success:
@@ -379,6 +439,7 @@ Thank you"""
                     else:
                         st.error(result)
                 st.markdown('</div>', unsafe_allow_html=True)
+
             # Display tickets related to the current customer in a grid format
             customer_tickets = [ticket for ticket in tickets if ticket["user_id"] == row['id']]
             if customer_tickets:
@@ -397,7 +458,7 @@ Thank you"""
             st.markdown('</div>', unsafe_allow_html=True)
 
     # Display the tickets in a collapsible format
-    with st.expander("View ll Ticket Updates", expanded=False):
+    with st.expander("View All Ticket Updates", expanded=False):
         st.markdown('<div class="dataframe-container">', unsafe_allow_html=True)
         try:
             df_tickets = pd.DataFrame(tickets)
@@ -414,6 +475,37 @@ Thank you"""
             st.error(f"Error loading ticket data: {e}")
         st.markdown('</div>', unsafe_allow_html=True)
 
+# Main function
+def main():
+    if 'selected_company' not in st.session_state:
+        st.session_state.selected_company = None
+
+    # Move company selection to sidebar with styled buttons
+    st.sidebar.title("Company Selection")
+
+    if st.sidebar.button("OBF", key="obf_button", help="Select OBF", use_container_width=True):
+        st.session_state.selected_company = "OBF"
+
+    if st.sidebar.button("Modulr", key="modulr_button", help="Select Modulr", use_container_width=True):
+        st.session_state.selected_company = "Modulr"
+
+    if st.sidebar.button("Salary Finance", key="salary_finance_button", help="Select Salary Finance",
+                         use_container_width=True):
+        st.session_state.selected_company = "Salary Finance"
+
+    # Main content area
+    col1, col2 = st.columns([1, 8])
+    with col2:
+        st.title("Customer Relationship Management Portal")
+    with col1:
+        st.image("https://logovtor.com/wp-content/uploads/2021/08/blenheim-chalcot-logo-vector.png", width=125)
+
+    # Display main content if a company is selected
+    if st.session_state.selected_company:
+        st.write(f"Selected Portfolio: **{st.session_state.selected_company}**")
+        display_main_content(st.session_state.selected_company)
+    else:
+        st.write("Please select a Portfolio from the sidebar to view customer data.")
 
 if __name__ == "__main__":
     main()
