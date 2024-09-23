@@ -293,7 +293,7 @@ def get_company_specific_link(company, ticket_id):
     base_urls = {
         "OBF": "https://obfdocvalidator.streamlit.app",
         "Modulr": "https://modulr-doc-validator-e0c8fucjbwe2edef.uksouth-01.azurewebsites.net",
-        "Salary Finance": "https://salaryfinanacedocvalidator.streamlit.app"
+        "Salary Finance": "https://salaryfinancedocvalidator.streamlit.app"
     }
     base_url = base_urls.get(company, "https://default-validator.example.com")
     return f"{base_url}/?ticket_id={ticket_id}"
