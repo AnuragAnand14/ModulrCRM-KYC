@@ -68,7 +68,7 @@ st.markdown("""
     left: 0;
     bottom: 0;
     width: 100%;
-    background-color: #514fff;
+    background-color: #FF0000;
     color: #ffffff;
     text-align: center;
     padding: 10px 0;
