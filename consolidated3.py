@@ -614,7 +614,7 @@ def main():
 
     url_ticket_id = get_ticket_id_from_url()
 
-    col1, col2, col3, col4 = st.columns([3, 1, 2, 1])
+    col1, col2, col3, col4 = st.columns([2, 1, 2, 1])
   
     with col4:
         
