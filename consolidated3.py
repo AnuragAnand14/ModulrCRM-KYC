@@ -635,6 +635,14 @@ def main():
                 mime="application/zip"
             ):
                 st.success("Sample documents downloaded successfully!")
+
+            message_placeholder.success("Sample documents downloaded successfully!")
+            
+            # Wait for 3 seconds
+            time.sleep(3)
+            
+            # Clear the success message
+            message_placeholder.empty()
         else:
             st.error("Failed to fetch the folder from GitHub.")
     with col3:
