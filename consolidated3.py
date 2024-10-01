@@ -199,7 +199,8 @@ def get_dropdown_names(TicketType):
 
 def fetch_github_zip(repo_owner, repo_name, branch="main"):
     # Construct the URL for the zip file
-    zip_url = f"https://github.com/{repo_owner}/{repo_name}/archive/{branch}.zip"
+    zip_url = f"https://github.com/{repo_owner}/{repo_name}/archive/{branch}/{folder}.zip"
+ 
     
     # Fetch the zip file
     response = requests.get(zip_url)
@@ -603,7 +604,10 @@ def main():
           # GitHub repository details
           repo_owner = "AnuragAnand14"
           repo_name = "ModulrCRM-KYC"
-          branch = "anu111"  # The branch name you want to download
+          branch = "anu111" 
+          folder="dummydocs" 
+
+# The branch name you want to download
           
           # Fetch the zip file
           zip_data = fetch_github_zip(repo_owner, repo_name, branch)
