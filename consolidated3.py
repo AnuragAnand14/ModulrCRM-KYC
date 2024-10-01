@@ -14,6 +14,7 @@ from langchain_openai import ChatOpenAI
 from langchain_core.pydantic_v1 import BaseModel, Field
 import uuid
 import pandas as pd
+import requests 
 import psycopg2
 from psycopg2 import sql
 from urllib.parse import urlparse, parse_qs
