@@ -597,7 +597,7 @@ def main():
             st.info("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
 
         # Add a button to download a sample zip file from GitHub
-        if st.button(f"[Download Sample Documents]({google_drive_link})")
+        if st.button(f"[Download Sample Documents]({google_drive_link})"):
             file_id = "1p2LpltzuXM86XbPRHGmwQUXisZZ9Xits"
             google_drive_link = f"https://drive.google.com/uc?export=download&id={file_id}"
            
