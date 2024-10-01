@@ -420,13 +420,12 @@ def checkbankstatement(file_path):
     # Assuming you have the `model` and `BankStatement` already defined
     structured_model = model.with_structured_output(BankStatement)
     response = structured_model.invoke(text)
-
-    response = structured_model.invoke(text)
+    
     if response.Verification == False:
-        return -1
+        return "Incorrect Document Uploaded"
     else:
         if response.has_empty_fields():
-            return 0
+            return "Reupload better image"
         return 1 if is_difference_at_least_sixty_days(response.Firstdate, response.Lastdate) else 0
 
 
