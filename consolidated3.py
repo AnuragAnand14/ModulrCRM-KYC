@@ -3,6 +3,7 @@ from PIL import Image
 import PyPDF2
 import os
 import time
+import io
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import openai
