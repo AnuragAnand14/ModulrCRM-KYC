@@ -593,9 +593,7 @@ def main():
 
     col1, col2, col3, col4 = st.columns([3, 1, 2, 1])
     with col4:
-        st.markdown("")
-    with col3:
-        if st.button("Show Sample ID"):
+         if st.button("Show Sample ID"):
             st.info("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
 
         # Add a button to download a sample zip file from GitHub
@@ -607,6 +605,8 @@ def main():
             mime="application/zip"
         ):
             st.success("Sample documents downloaded successfully!")
+    with col3:
+        st.markdown("")
     with col1:
         ticket_id = st.text_input("Enter your Ticket ID:", value=url_ticket_id, key="ticket_id")
 
