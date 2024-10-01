@@ -197,18 +197,34 @@ def get_dropdown_names(TicketType):
         return ["Payslip", "Bank Statement", "Passport", "Driving License"]
 
 
-def fetch_github_zip(repo_owner, repo_name ,folder,branch="anu111"):
-    # Construct the URL for the zip file
-    zip_url = f"https://github.com/{repo_owner}/{repo_name}/archive/{branch}/{folder}.zip"
- 
+def fetch_github_folder(repo_owner, repo_name, folder_path, branch="main"):
+    # GitHub API URL for the contents of the folder
+    api_url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{folder_path}?ref={branch}"
     
-    # Fetch the zip file
-    response = requests.get(zip_url)
-    if response.status_code == 200:
-        return io.BytesIO(response.content)
-    else:
-        st.error(f"Failed to fetch the zip file. Status code: {response.status_code}")
+    # Fetch the contents of the folder
+    response = requests.get(api_url)
+    if response.status_code != 200:
+        st.error(f"Failed to fetch folder contents. Status code: {response.status_code}")
         return None
+    
+    contents = response.json()
+    
+    # Create a BytesIO object to store the zip file
+    zip_buffer = io.BytesIO()
+    
+    with zipfile.ZipFile(zip_buffer, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+        for item in contents:
+            if item['type'] == 'file':
+                # Fetch the file content
+                file_response = requests.get(item['download_url'])
+                if file_response.status_code == 200:
+                    # Add the file to the zip
+                    zip_file.writestr(item['name'], file_response.content)
+                else:
+                    st.warning(f"Failed to fetch file: {item['name']}")
+    
+    zip_buffer.seek(0)
+    return zip_buffer
 
 
 def get_ticket_type(ticket_id):
@@ -598,30 +614,28 @@ def main():
 
     col1, col2, col3, col4 = st.columns([3, 1, 2, 1])
     with col4:
-          if st.button("Show Sample ID"):
-              st.info("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
-          
-          # GitHub repository details
-          repo_owner = "AnuragAnand14"
-          repo_name = "ModulrCRM-KYC"
-          branch = "anu111" 
-          folder="dummydocs" 
-
-# The branch name you want to download
-          
-          # Fetch the zip file
-          zip_data = fetch_github_zip(repo_owner, repo_name, branch)
-          
-          if zip_data:
-              if st.download_button(
-                  label="Download Sample Documents",
-                  data=zip_data,
-                  file_name="sample_documents.zip",
-                  mime="application/zip"
-              ):
-                  st.success("Sample documents downloaded successfully!")
-          else:
-              st.error("Failed to fetch the zip file from GitHub.")
+        if st.button("Show Sample ID"):
+            st.info("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
+        
+        # GitHub repository details
+        repo_owner = "AnuragAnand14"
+        repo_name = "ModulrCRM-KYC"
+        branch = "anu111"  # The branch name you want to download from
+        folder_path = "dummydocs"  # The folder you want to download
+        
+        # Fetch the zip file
+        zip_data = fetch_github_folder(repo_owner, repo_name, folder_path, branch)
+        
+        if zip_data:
+            if st.download_button(
+                label="Download Sample Documents",
+                data=zip_data,
+                file_name="sample_documents.zip",
+                mime="application/zip"
+            ):
+                st.success("Sample documents downloaded successfully!")
+        else:
+            st.error("Failed to fetch the folder from GitHub.")
     with col3:
         st.markdown("")
     with col1:
