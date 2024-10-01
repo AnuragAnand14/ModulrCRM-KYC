@@ -617,8 +617,8 @@ def main():
     col1, col2, col3, col4 = st.columns([3, 1, 2, 1])
   
     with col4:
-        if st.button("Show Sample ID"):
-            st.info("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
+        
+           sr.write("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
         
         # GitHub repository details
         repo_owner = "AnuragAnand14"
