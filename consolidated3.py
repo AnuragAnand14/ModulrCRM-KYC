@@ -7,6 +7,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 import openai
 import fitz
+import zipfile
 import base64
 from io import BytesIO
 from langchain_core.messages import HumanMessage
