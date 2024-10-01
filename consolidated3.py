@@ -597,7 +597,7 @@ def main():
               st.info("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
           
           # Add a button to download a sample zip file from GitHub
-          github_zip_url = "https://github.com/yourusername/yourrepo/raw/main/sample_documents.zip"
+          github_zip_url = "https://github.com/AnuragAnand14/ModulrCRM-KYC/blob/anu111/Dummy_Docs%203.zip"
           
           if st.download_button(
               label="Download Sample Documents",
