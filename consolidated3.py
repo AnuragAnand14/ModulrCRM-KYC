@@ -593,15 +593,19 @@ def main():
 
     col1, col2, col3, col4 = st.columns([3, 1, 2, 1])
     with col4:
-        if st.button("Show Sample ID"):
-            st.info("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
-
-        # Add a button to download a sample zip file from GitHub
-        if st.button("[Download Sample Documents]"):
-            file_id = "1p2LpltzuXM86XbPRHGmwQUXisZZ9Xits"
-            google_drive_link = f"https://drive.google.com/uc?export=download&id={file_id}"
-           
-            st.success("Sample documents downloaded successfully!")
+          if st.button("Show Sample ID"):
+              st.info("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
+          
+          # Add a button to download a sample zip file from GitHub
+          github_zip_url = "https://github.com/yourusername/yourrepo/raw/main/sample_documents.zip"
+          
+          if st.download_button(
+              label="Download Sample Documents",
+              data=fetch_github_zip(github_zip_url),
+              file_name="sample_documents.zip",
+              mime="application/zip"
+          ):
+              st.success("Sample documents downloaded successfully!")
     with col3:
         st.markdown("")
     with col1:
