@@ -602,8 +602,7 @@ def main():
                 label="Download Sample Documents",
                 data=fetch_github_zip(github_zip_url),
                 file_name="sample_documents.zip",
-                mime="application/zip"
-            ):
+                mime="application/zip"  ):
                 st.success("Sample documents downloaded successfully!")
     with col3:
         st.markdown("")
