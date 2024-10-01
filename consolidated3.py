@@ -615,37 +615,38 @@ def main():
     url_ticket_id = get_ticket_id_from_url()
 
     col1, col2, col3, col4 = st.columns([3, 1, 2, 1])
+  
     with col4:
-    if st.button("Show Sample ID"):
-        st.info("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
-    
-    # GitHub repository details
-    repo_owner = "AnuragAnand14"
-    repo_name = "ModulrCRM-KYC"
-    branch = "anu111"  # The branch name you want to download from
-    folder_path = "dummydocs"  # The folder you want to download
-    
-    # Fetch the zip file
-    zip_data = fetch_github_folder(repo_owner, repo_name, folder_path, branch)
-    
-    if zip_data:
-        # Create a placeholder for the success message
-        message_placeholder = st.empty()
+        if st.button("Show Sample ID"):
+            st.info("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
         
-        if st.download_button(
-            label="Download Sample Documents",
-            data=zip_data,
-            file_name="sample_documents.zip",
-            mime="application/zip"
-        ):
-            # Show success message
-            message_placeholder.success("Sample documents downloaded successfully!")
+        # GitHub repository details
+        repo_owner = "AnuragAnand14"
+        repo_name = "ModulrCRM-KYC"
+        branch = "anu111"  # The branch name you want to download from
+        folder_path = "dummydocs"  # The folder you want to download
+        
+        # Fetch the zip file
+        zip_data = fetch_github_folder(repo_owner, repo_name, folder_path, branch)
+        
+        if zip_data:
+            # Create a placeholder for the success message
+            message_placeholder = st.empty()
             
-            # Wait for 3 seconds
-            time.sleep(3)
-            
-            # Clear the success message
-            message_placeholder.empty()
+            if st.download_button(
+                label="Download Sample Documents",
+                data=zip_data,
+                file_name="sample_documents.zip",
+                mime="application/zip"
+            ):
+                # Show success message
+                message_placeholder.success("Sample documents downloaded successfully!")
+                
+                # Wait for 3 seconds
+                time.sleep(3)
+                
+                # Clear the success message
+                message_placeholder.empty()
     else:
         st.error("Failed to fetch the folder from GitHub.")
     with col3:
