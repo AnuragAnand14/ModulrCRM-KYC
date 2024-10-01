@@ -197,7 +197,7 @@ def get_dropdown_names(TicketType):
         return ["Payslip", "Bank Statement", "Passport", "Driving License"]
 
 
-def fetch_github_zip(repo_owner, repo_name, branch="main"):
+def fetch_github_zip(repo_owner, repo_name, branch="anu111",folder):
     # Construct the URL for the zip file
     zip_url = f"https://github.com/{repo_owner}/{repo_name}/archive/{branch}/{folder}.zip"
  
