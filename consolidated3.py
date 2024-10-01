@@ -630,13 +630,12 @@ def main():
         
         if zip_data:
             if st.download_button(
-                label="Download Sample Documents",
-                data=zip_data,
-                file_name="sample_documents.zip",
-                mime="application/zip"
-            ):
-                st.success("Sample documents downloaded successfully!")
-
+            label="Download Sample Documents",
+            data=zip_data,
+            file_name="sample_documents.zip",
+            mime="application/zip"
+        ):
+            # Show success message
             message_placeholder.success("Sample documents downloaded successfully!")
             
             # Wait for 3 seconds
