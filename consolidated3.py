@@ -196,6 +196,15 @@ def get_dropdown_names(TicketType):
         return ["Payslip", "Bank Statement", "Passport", "Driving License"]
 
 
+def fetch_github_zip(github_url):
+    response = requests.get(github_url)
+    if response.status_code == 200:
+        return response.content
+    else:
+        st.error(f"Failed to fetch zip file from GitHub. Status code: {response.status_code}")
+        return None
+
+
 def get_ticket_type(ticket_id):
     if not ticket_id or not is_valid_uuid(ticket_id):
         return None
@@ -585,7 +594,18 @@ def main():
     with col4:
         st.markdown("")
     with col3:
-        st.markdown("")
+        if st.button("Show Sample ID"):
+            st.info("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
+
+        # Add a button to download a sample zip file from GitHub
+        github_zip_url = "https://github.com/yourusername/yourrepo/raw/main/sample_documents.zip"
+        if st.download_button(
+            label="Download Sample Documents",
+            data=fetch_github_zip(github_zip_url),
+            file_name="sample_documents.zip",
+            mime="application/zip"
+        ):
+            st.success("Sample documents downloaded successfully!")
     with col1:
         ticket_id = st.text_input("Enter your Ticket ID:", value=url_ticket_id, key="ticket_id")
 
