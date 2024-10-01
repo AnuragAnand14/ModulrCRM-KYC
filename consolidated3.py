@@ -559,7 +559,7 @@ def main():
     with col1:
       st.image(
         "https://logovtor.com/wp-content/uploads/2021/08/blenheim-chalcot-logo-vector.png",
-        width=210)
+        width=180)
 
     st.markdown(
         """
