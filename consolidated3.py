@@ -647,8 +647,8 @@ def main():
                 
                 # Clear the success message
                 message_placeholder.empty()
-    else:
-        st.error("Failed to fetch the folder from GitHub.")
+        else:
+                st.error("Failed to fetch the folder from GitHub.")
     with col3:
         st.markdown("")
     with col1:
