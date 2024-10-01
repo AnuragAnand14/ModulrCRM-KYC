@@ -197,12 +197,16 @@ def get_dropdown_names(TicketType):
         return ["Payslip", "Bank Statement", "Passport", "Driving License"]
 
 
-def fetch_github_zip(github_url):
-    response = requests.get(github_url)
+def fetch_github_zip(repo_owner, repo_name, branch="main"):
+    # Construct the URL for the zip file
+    zip_url = f"https://github.com/{repo_owner}/{repo_name}/archive/{branch}.zip"
+    
+    # Fetch the zip file
+    response = requests.get(zip_url)
     if response.status_code == 200:
-        return response.content
+        return io.BytesIO(response.content)
     else:
-        st.error(f"Failed to fetch zip file from GitHub. Status code: {response.status_code}")
+        st.error(f"Failed to fetch the zip file. Status code: {response.status_code}")
         return None
 
 
@@ -596,16 +600,24 @@ def main():
           if st.button("Show Sample ID"):
               st.info("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
           
-          # Add a button to download a sample zip file from GitHub
-          github_zip_url = "https://github.com/AnuragAnand14/ModulrCRM-KYC/tree/anu111/dummydocs"
+          # GitHub repository details
+          repo_owner = "AnuragAnand14"
+          repo_name = "ModulrCRM-KYC"
+          branch = "anu111"  # The branch name you want to download
           
-          if st.download_button(
-              label="Download Sample Documents",
-              data=fetch_github_zip(github_zip_url),
-              file_name="sample_documents.zip",
-              
-          ):
-              st.success("Sample documents downloaded successfully!")
+          # Fetch the zip file
+          zip_data = fetch_github_zip(repo_owner, repo_name, branch)
+          
+          if zip_data:
+              if st.download_button(
+                  label="Download Sample Documents",
+                  data=zip_data,
+                  file_name="sample_documents.zip",
+                  mime="application/zip"
+              ):
+                  st.success("Sample documents downloaded successfully!")
+          else:
+              st.error("Failed to fetch the zip file from GitHub.")
     with col3:
         st.markdown("")
     with col1:
