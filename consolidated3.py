@@ -618,7 +618,7 @@ def main():
   
     with col4:
         
-        st.write("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
+        st.markdown("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
         
         # GitHub repository details
         repo_owner = "AnuragAnand14"
