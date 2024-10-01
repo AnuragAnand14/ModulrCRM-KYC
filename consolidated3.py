@@ -616,20 +616,23 @@ def main():
 
     col1, col2, col3, col4 = st.columns([3, 1, 2, 1])
     with col4:
-        if st.button("Show Sample ID"):
-            st.info("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
+    if st.button("Show Sample ID"):
+        st.info("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
+    
+    # GitHub repository details
+    repo_owner = "AnuragAnand14"
+    repo_name = "ModulrCRM-KYC"
+    branch = "anu111"  # The branch name you want to download from
+    folder_path = "dummydocs"  # The folder you want to download
+    
+    # Fetch the zip file
+    zip_data = fetch_github_folder(repo_owner, repo_name, folder_path, branch)
+    
+    if zip_data:
+        # Create a placeholder for the success message
+        message_placeholder = st.empty()
         
-        # GitHub repository details
-        repo_owner = "AnuragAnand14"
-        repo_name = "ModulrCRM-KYC"
-        branch = "anu111"  # The branch name you want to download from
-        folder_path = "dummydocs"  # The folder you want to download
-        
-        # Fetch the zip file
-        zip_data = fetch_github_folder(repo_owner, repo_name, folder_path, branch)
-        
-        if zip_data:
-            if st.download_button(
+        if st.download_button(
             label="Download Sample Documents",
             data=zip_data,
             file_name="sample_documents.zip",
@@ -643,8 +646,8 @@ def main():
             
             # Clear the success message
             message_placeholder.empty()
-        else:
-            st.error("Failed to fetch the folder from GitHub.")
+    else:
+        st.error("Failed to fetch the folder from GitHub.")
     with col3:
         st.markdown("")
     with col1:
