@@ -618,8 +618,9 @@ def main():
   
     with col4:
         
-        st.button("Sample ID: 123e4567-e89b-12d3-a456-426614174000")
-        
+        st.info("Sample ID:")
+        st.code("123e4567-e89b-12d3-a456-426614174000", language="text")
+                
         # GitHub repository details
         repo_owner = "AnuragAnand14"
         repo_name = "ModulrCRM-KYC"
