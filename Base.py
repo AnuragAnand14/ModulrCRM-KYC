@@ -291,9 +291,9 @@ def send_whatsapp_message(to_number, message):
 
 def get_company_specific_link(company, ticket_id):
     base_urls = {
-        "OBF": "https://salaryfinancedocvalidator.streamlit.app",
+        "OBF": "https://obfdocvalidator.streamlit.app",
         "Modulr": "https://salaryfinancedocvalidator.streamlit.app",
-        "Salary Finance": "https://salaryfinancedocvalidator.streamlit.app"
+        "Salary Finance": "https://docvalidator.streamlit.app"
     }
     base_url = base_urls.get(company, "https://default-validator.example.com")
     return f"{base_url}/?ticket_id={ticket_id}"
