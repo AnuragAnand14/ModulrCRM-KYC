@@ -228,7 +228,7 @@ def send_email(to_email, subject, body):
         context = ssl.create_default_context(cafile=certifi.where())
 
         # Connect to the SMTP server and send the email
-        with smtplib.SMTP('smtp.gmail.com') as server:
+        with smtplib.SMTP_SSL('smtp.gmail.com') as server:
             server.login(sender_email, sender_password)
             server.sendmail(sender_email, to_email, message.as_string())
         return True
