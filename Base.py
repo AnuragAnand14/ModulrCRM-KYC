@@ -211,7 +211,7 @@ def send_email(to_email, subject, body):
     smtp_server = "smtp.gmail.com"  # Gmail's SMTP server (or your preferred SMTP server)
     smtp_port = 465  # For SSL
     sender_email = "mteam8826@gmail.com"
-    sender_password = "cypi hvja csyq abcs"  # Use an app password if using Gmail
+    sender_password = "uzvq hrub sguq bqwv"  # Use an app password if using Gmail
 
     # Create the email
     message = MIMEMultipart()
